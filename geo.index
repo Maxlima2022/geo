@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Geolocalização</title>
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                alert("Geolocalização não suportada pelo navegador.");
+            }
+        }
+
+        function showPosition(position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+            document.getElementById("latitude").textContent = "Latitude: " + latitude;
+            document.getElementById("longitude").textContent = "Longitude: " + longitude;
+        }
+
+        function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("Permissão negada para geolocalização.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Informação de localização não disponível.");
+                    break;
+                case error.TIMEOUT:
+                    alert("Tempo limite esgotado para obter a localização.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("Erro desconhecido ao obter a localização.");
+                    break;
+            }
+        }
+    </script>
+</head>
+<body bgcolor="verde">
+    <h1>Geolocalização</h1>
+    <button onclick="getLocation()">Clique aqui</button>
+    <p id="latitude"></p>
+    <p id="longitude"></p>
+</body>
+</html>
+
