@@ -40,46 +40,27 @@
         peer.on('open', (id) => {
             console.log('ID do Peer:', id);
 
-            // Chame automaticamente o primeiro peer disponível
-            chamarOutroPeer();
-        });
-
-        // Quando uma conexão de mídia é recebida
-        peer.on('call', (call) => {
-            navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-                .then((stream) => {
-                    // Atenda a chamada e forneça o stream local
-                    call.answer(stream);
-                    const video = document.getElementById('remote-video');
-                    // Exiba o stream remoto no elemento de vídeo
-                    call.on('stream', (remoteStream) => {
-                        video.srcObject = remoteStream;
-                    });
-                })
-                .catch((error) => {
-                    console.error('Erro ao acessar a câmera:', error);
-                });
-        });
-
-        // Crie um novo Peer para chamar
-        function chamarOutroPeer() {
             navigator.mediaDevices.getUserMedia({ video: true, audio: false })
                 .then((stream) => {
                     const video = document.getElementById('remote-video');
                     video.srcObject = stream;
 
-                    // Chame um peer remoto
-                    const remotePeerId = prompt('Informe o ID do Peer remoto:');
-                    const call = peer.call(remotePeerId, stream);
-                    // Exiba o stream remoto no elemento de vídeo
-                    call.on('stream', (remoteStream) => {
-                        video.srcObject = remoteStream;
+                    // Chame automaticamente um peer remoto
+                    peer.listAllPeers((peers) => {
+                        const remotePeerId = peers.find(peerId => peerId !== id);
+                        if (remotePeerId) {
+                            const call = peer.call(remotePeerId, stream);
+                            // Exiba o stream remoto no elemento de vídeo
+                            call.on('stream', (remoteStream) => {
+                                video.srcObject = remoteStream;
+                            });
+                        }
                     });
                 })
                 .catch((error) => {
                     console.error('Erro ao acessar a câmera:', error);
                 });
-        }
+        });
     </script>
 
 </body>
