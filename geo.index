@@ -1,46 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Geolocalização</title>
-    <script>
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition, showError);
-            } else {
-                alert("Geolocalização não suportada pelo navegador.");
-            }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoramento Remoto de Câmera</title>
+    <script src="https://cdn.jsdelivr.net/npm/simplewebrtc/latest-v3.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
 
-        function showPosition(position) {
-            var latitude = position.coords.latitude;
-            var longitude = position.coords.longitude;
-            document.getElementById("latitude").textContent = "Latitude: " + latitude;
-            document.getElementById("longitude").textContent = "Longitude: " + longitude;
+        #remote-container {
+            width: 80%;
+            max-width: 600px;
+            text-align: center;
         }
 
-        function showError(error) {
-            switch(error.code) {
-                case error.PERMISSION_DENIED:
-                    alert("Permissão negada para geolocalização.");
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    alert("Informação de localização não disponível.");
-                    break;
-                case error.TIMEOUT:
-                    alert("Tempo limite esgotado para obter a localização.");
-                    break;
-                case error.UNKNOWN_ERROR:
-                    alert("Erro desconhecido ao obter a localização.");
-                    break;
-            }
+        #remote-video {
+            width: 100%;
+            height: auto;
         }
-    </script>
+    </style>
 </head>
-<body bgcolor="verde">
-    <h1>Geolocalização</h1>
-    <button onclick="getLocation()">Clique aqui</button>
-    <p id="latitude"></p>
-    <p id="longitude"></p>
+<body>
+
+    <div id="remote-container">
+        <video id="remote-video" autoplay playsinline></video>
+    </div>
+
+    <script>
+        // Crie uma instância do SimpleWebRTC
+        var webrtc = new SimpleWebRTC({
+            localVideoEl: '',
+            remoteVideosEl: 'remote-video',
+            autoRequestMedia: true,
+            debug: false
+        });
+
+        // Inicie a comunicação
+        webrtc.on('readyToCall', function () {
+            webrtc.joinRoom('sua-sala');
+        });
+    </script>
+
 </body>
 </html>
 
