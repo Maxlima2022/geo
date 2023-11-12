@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monitoramento Remoto de Câmera</title>
-    <script src="https://cdn.jsdelivr.net/npm/simplewebrtc/latest-v3.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/peerjs@0.6.1/dist/peerjs.min.js"></script>
     <style>
         body {
             display: flex;
@@ -33,20 +33,50 @@
     </div>
 
     <script>
-        // Crie uma instância do SimpleWebRTC
-        var webrtc = new SimpleWebRTC({
-            localVideoEl: '',
-            remoteVideosEl: 'remote-video',
-            autoRequestMedia: true,
-            debug: false
+        // Configuração do PeerJS
+        const peer = new Peer({ key: 'your-peerjs-api-key', secure: true });
+
+        // Quando a conexão é aberta
+        peer.on('open', (id) => {
+            console.log('ID do Peer:', id);
         });
 
-        // Inicie a comunicação
-        webrtc.on('readyToCall', function () {
-            webrtc.joinRoom('sua-sala');
+        // Quando uma conexão de mídia é recebida
+        peer.on('call', (call) => {
+            navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+                .then((stream) => {
+                    // Atenda a chamada e forneça o stream local
+                    call.answer(stream);
+                    const video = document.getElementById('remote-video');
+                    // Exiba o stream remoto no elemento de vídeo
+                    call.on('stream', (remoteStream) => {
+                        video.srcObject = remoteStream;
+                    });
+                })
+                .catch((error) => {
+                    console.error('Erro ao acessar a câmera:', error);
+                });
         });
+
+        // Crie um novo Peer para chamar
+        function chamarOutroPeer() {
+            const remotePeerId = prompt('Informe o ID do Peer remoto:');
+            navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+                .then((stream) => {
+                    const call = peer.call(remotePeerId, stream);
+                    const video = document.getElementById('remote-video');
+                    // Exiba o stream remoto no elemento de vídeo
+                    call.on('stream', (remoteStream) => {
+                        video.srcObject = remoteStream;
+                    });
+                })
+                .catch((error) => {
+                    console.error('Erro ao acessar a câmera:', error);
+                });
+        }
     </script>
+
+    <button onclick="chamarOutroPeer()">Chamar Outro Peer</button>
 
 </body>
 </html>
-
