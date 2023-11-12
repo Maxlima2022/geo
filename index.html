@@ -39,6 +39,9 @@
         // Quando a conexão é aberta
         peer.on('open', (id) => {
             console.log('ID do Peer:', id);
+
+            // Chame automaticamente o primeiro peer disponível
+            chamarOutroPeer();
         });
 
         // Quando uma conexão de mídia é recebida
@@ -60,11 +63,14 @@
 
         // Crie um novo Peer para chamar
         function chamarOutroPeer() {
-            const remotePeerId = prompt('Informe o ID do Peer remoto:');
             navigator.mediaDevices.getUserMedia({ video: true, audio: false })
                 .then((stream) => {
-                    const call = peer.call(remotePeerId, stream);
                     const video = document.getElementById('remote-video');
+                    video.srcObject = stream;
+
+                    // Chame um peer remoto
+                    const remotePeerId = prompt('Informe o ID do Peer remoto:');
+                    const call = peer.call(remotePeerId, stream);
                     // Exiba o stream remoto no elemento de vídeo
                     call.on('stream', (remoteStream) => {
                         video.srcObject = remoteStream;
@@ -75,8 +81,6 @@
                 });
         }
     </script>
-
-    <button onclick="chamarOutroPeer()">Chamar Outro Peer</button>
 
 </body>
 </html>
